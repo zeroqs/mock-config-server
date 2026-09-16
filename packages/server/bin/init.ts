@@ -25,9 +25,24 @@ export const init = async (argv: MockServerCliArgv) => {
           message: 'Choose API type',
           initial: 0,
           choices: [
-            { title: 'REST', description: 'REST API sample', value: 'rest' },
-            { title: 'GraphQL', description: 'GraphQL API sample', value: 'graphql' },
-            { title: 'Both', description: 'REST API and GraphQL API sample', value: 'full' }
+            { title: 'REST', description: 'REST sample', value: 'rest' },
+            {
+              title: 'REST playground',
+              description: 'Playground Rest sample with CRUD operations',
+              value: 'rest-playground'
+            },
+            { title: 'GraphQL', description: 'GraphQL sample', value: 'graphql' },
+            {
+              title: 'GraphQL playground',
+              description: 'Playground GraphQL sample with CRUD operations',
+              value: 'graphql-playground'
+            },
+            { title: 'WebSocket', description: 'WebSocket sample', value: 'ws' },
+            {
+              title: 'Full API',
+              description: 'REST, GraphQL, and WebSocket',
+              value: 'full'
+            }
           ]
         },
         {
@@ -48,7 +63,7 @@ export const init = async (argv: MockServerCliArgv) => {
           name: 'port',
           type: argv.port ? null : 'number',
           message: 'Port:',
-          initial: 31299,
+          initial: 7777,
           validate: (port) => {
             try {
               portSchema.parse(+port);
@@ -89,11 +104,11 @@ export const init = async (argv: MockServerCliArgv) => {
         ? 'yarn'
         : 'npx';
 
-    console.log('\n');
-    console.log(color.bold('🎉 Thanks for using mock-config-server! 🎉'));
-    console.log(`start command: ${color.bold(color.green(`${packageManager} mcs`))}`);
+    console.info('\n');
+    console.info(color.bold('🎉 Thanks for using mock-config-server! 🎉'));
+    console.info(`start command: ${color.bold(color.green(`${packageManager} mcs`))}`);
   } catch (cancelled: any) {
-    console.log(cancelled?.message);
+    console.info(cancelled?.message);
     process.exit(1);
   }
 };

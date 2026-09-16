@@ -1,6 +1,14 @@
-import type { ResponseInterceptorParams } from 'mock-config-server';
-
-import { equals, graphql, mock, oneOf, regExp, rest, startsWith, ws } from 'mock-config-server';
+import {
+  equals,
+  graphql,
+  http,
+  mock,
+  oneOf,
+  regExp,
+  rest,
+  startsWith,
+  ws
+} from 'mock-config-server';
 
 const USERS = [
   {
@@ -75,12 +83,12 @@ export default mock(
   },
   {
     name: 'users',
-    interceptors: {
-      response: (data: unknown, params: ResponseInterceptorParams) => {
+    interceptors: [
+      http.response.all((data, params) => {
         params.setHeader('x-total-count', String(USERS.length));
         return data;
-      }
-    },
+      })
+    ],
     configs: [
       rest.get('/users', { items: USERS, page: 1, limit: 10, total: USERS.length }),
       rest.get(

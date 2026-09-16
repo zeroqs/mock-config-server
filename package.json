@@ -2,7 +2,6 @@
   "name": "mock-config",
   "license": "MIT",
   "homepage": "https://github.com/siberiacancode/mock-config",
-  "version": "5.0.0-beta.2",
   "private": true,
   "author": {
     "name": "SIBERIA CAN CODE 🧊",
@@ -24,17 +23,19 @@
   "scripts": {
     "build": "pnpm -r run build",
     "lint": "pnpm -r run lint",
+    "type": "pnpm -r run type",
     "format": "pnpm -r run format",
     "pretty": "pnpm -r run pretty",
     "unit-test": "pnpm -r run unit-test",
     "prepare": "husky"
   },
   "devDependencies": {
-    "@siberiacancode/eslint": "^2.17.5",
-    "@siberiacancode/prettier": "^1.7.0",
-    "@types/node": "^25.9.2",
+    "@siberiacancode/eslint": "^2.18.0",
+    "@siberiacancode/prettier": "^1.8.0",
+    "@types/node": "^26.1.1",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.7",
-    "typescript": "^5.8.2"
+    "lint-staged": "^17.0.8",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   }
 }
