@@ -4,6 +4,7 @@ export * from './getComponentName';
 export * from './getConfigInterceptors';
 export * from './getCounts';
 export * from './getDefaultScheme';
+export * from './interceptor';
 export * from './isSerializedFunction';
 export * from './mergeComponentConfigs';
 export * from './transports';

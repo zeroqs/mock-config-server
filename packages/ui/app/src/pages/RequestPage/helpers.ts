@@ -7,7 +7,7 @@ import {
 } from '@/utils/helpers';
 
 import type { SendTarget } from './components/SendRequestDrawer/types';
-import type { InterceptorEntry, RouteEntry, RouteMatcher } from './types';
+import type { RouteEntry, RouteMatcher } from './types';
 
 export const getSendTarget = (
   config: MockServerComponent['configs'][number]
@@ -68,33 +68,4 @@ export const getRouteMatchers = (route: RouteEntry): RouteMatcher[] => {
 export const formatRouteData = (data: unknown) => {
   if (isSerializedFunction(data)) return data;
   return JSON.stringify(data, null, 2) ?? 'undefined';
-};
-
-export const getInterceptorEntries = (
-  component: MockServerComponent,
-  config: MockServerComponent['configs'][number],
-  routes: RouteEntry[]
-) => {
-  const levels = [
-    { level: 'component', interceptors: component.interceptors },
-    { level: 'request', interceptors: 'interceptors' in config ? config.interceptors : undefined },
-    ...routes.map((route, routeIndex) => ({
-      level: `route #${routeIndex + 1}`,
-      interceptors: route.interceptors
-    }))
-  ];
-
-  return levels.flatMap((entry) => {
-    if (!entry.interceptors) return [];
-
-    return (['request', 'response'] as const)
-      .filter((type) => entry.interceptors?.[type])
-      .map(
-        (type): InterceptorEntry => ({
-          level: entry.level,
-          type,
-          code: String(entry.interceptors?.[type])
-        })
-      );
-  });
 };

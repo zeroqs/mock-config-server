@@ -12,7 +12,7 @@ import {
 import { getRouteGroups } from './helpers';
 
 export const RoutesPage = () => {
-  const { components } = useConfig();
+  const { components, settings } = useConfig();
   const search = useSearch({ from: '/routes' });
   const navigate = useNavigate({ from: '/routes' });
 
@@ -54,7 +54,7 @@ export const RoutesPage = () => {
               </div>
 
               {configs.map(({ config, configIndex }) => {
-                const interceptors = getConfigInterceptors(config);
+                const interceptors = getConfigInterceptors(config, component, settings);
 
                 return (
                   <Link
@@ -74,7 +74,7 @@ export const RoutesPage = () => {
                     <span className='ml-auto flex shrink-0 items-center gap-1.5'>
                       {Boolean(interceptors.count) && (
                         <span className='rounded-full border border-border bg-background-secondary px-2 py-0.5 text-[11px] font-medium text-foreground-secondary'>
-                          {interceptors.count}
+                          {interceptors.count}{' '}
                           {interceptors.count === 1 ? 'interceptor' : 'interceptors'}
                         </span>
                       )}

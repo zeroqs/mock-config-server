@@ -19,17 +19,18 @@ import {
   getConfigApiType,
   getConfigLabel,
   getConfigMethod,
-  getConfigTransport
+  getConfigTransport,
+  getInterceptorEntries
 } from '@/utils/helpers';
 
 import type { RouteEntry } from './types';
 
 import { MatcherChip } from './components/MatcherChip/MatcherChip';
 import { SendRequestDrawer } from './components/SendRequestDrawer/SendRequestDrawer';
-import { formatRouteData, getInterceptorEntries, getRouteMatchers, getSendTarget } from './helpers';
+import { formatRouteData, getRouteMatchers, getSendTarget } from './helpers';
 
 export const RequestPage = () => {
-  const { components } = useConfig();
+  const { components, settings } = useConfig();
   const { requestId } = useParams({ from: '/routes/$requestId' });
 
   const [isSendOpen, setIsSendOpen] = useState(false);
@@ -51,7 +52,13 @@ export const RequestPage = () => {
   const routes = config.routes as RouteEntry[];
   const apiType = getConfigApiType(config);
   const hasStatus = getConfigTransport(config)?.hasStatus ?? false;
-  const interceptorEntries = getInterceptorEntries(component, config, routes);
+  const interceptorEntries = getInterceptorEntries(config, {
+    component: component.interceptors,
+    server: settings.interceptors
+  });
+  const appliedInterceptors = interceptorEntries.filter((entry) => entry.applied);
+  const skippedInterceptors = interceptorEntries.filter((entry) => !entry.applied);
+  const interceptorTarget = 'type' in config ? String(config.type) : getConfigMethod(config);
   const sendTarget = getSendTarget(config);
 
   return (
@@ -84,7 +91,7 @@ export const RequestPage = () => {
           <TabsTrigger value='interceptors'>
             Interceptors
             <span className='rounded-full bg-card px-1.5 text-[11px] text-foreground-secondary group-data-active:bg-accent group-data-active:text-accent-foreground'>
-              {interceptorEntries.length}
+              {appliedInterceptors.length}
             </span>
           </TabsTrigger>
           <TabsTrigger value='raw'>Raw config</TabsTrigger>
@@ -180,27 +187,34 @@ export const RequestPage = () => {
         <TabsContent value='interceptors'>
           {!interceptorEntries.length && (
             <Typography className='text-foreground-secondary'>
-              This request has no interceptors on any level
+              No interceptors are defined on the component or the server
+            </Typography>
+          )}
+
+          {Boolean(interceptorEntries.length) && !appliedInterceptors.length && (
+            <Typography className='pb-3.5 text-foreground-secondary'>
+              None of the defined interceptors run for this request
             </Typography>
           )}
 
           <div className='flex flex-col gap-3.5'>
-            {interceptorEntries.map((entry) => (
+            {appliedInterceptors.map((entry, entryIndex) => (
               <div
-                key={`${entry.level}-${entry.type}`}
+                key={`${entry.level}-${entry.name}-${entryIndex}`}
                 className='overflow-hidden rounded-xl border border-border bg-card'
               >
                 <div className='flex items-center gap-2 border-b border-border/60 px-4 py-3'>
-                  {entry.type === 'request' && (
+                  <span className='font-code text-[11px] text-foreground-secondary'>
+                    #{entryIndex + 1}
+                  </span>
+                  {entry.phase === 'request' && (
                     <ArrowDownToDotIcon className='size-3.5 text-accent' />
                   )}
-                  {entry.type === 'response' && (
+                  {entry.phase === 'response' && (
                     <ArrowUpFromDotIcon className='size-3.5 text-accent' />
                   )}
-                  <span className='font-code text-xs text-foreground'>
-                    {entry.type} interceptor
-                  </span>
-                  <span className='rounded-md border border-border bg-background-secondary px-2 py-0.5 font-code text-[11px] text-foreground-secondary'>
+                  <span className='font-code text-xs text-foreground'>{entry.name}</span>
+                  <span className='ml-auto rounded-md border border-border bg-background-secondary px-2 py-0.5 font-code text-[11px] text-foreground-secondary'>
                     defined on {entry.level}
                   </span>
                 </div>
@@ -208,6 +222,37 @@ export const RequestPage = () => {
                   {entry.code}
                 </pre>
               </div>
+            ))}
+
+            {Boolean(skippedInterceptors.length) && (
+              <div className='pt-2 font-code text-[10px] uppercase tracking-wider text-foreground-secondary'>
+                Not applied to {interceptorTarget}
+              </div>
+            )}
+
+            {skippedInterceptors.map((entry, entryIndex) => (
+              <details
+                key={`${entry.level}-${entry.name}-${entryIndex}`}
+                className='group overflow-hidden rounded-xl border border-dashed border-border opacity-60'
+              >
+                <summary className='flex cursor-pointer list-none items-center gap-2 px-4 py-3 group-open:border-b group-open:border-border/60'>
+                  {entry.phase === 'request' && (
+                    <ArrowDownToDotIcon className='size-3.5 text-foreground-secondary' />
+                  )}
+                  {entry.phase === 'response' && (
+                    <ArrowUpFromDotIcon className='size-3.5 text-foreground-secondary' />
+                  )}
+                  <span className='font-code text-xs text-foreground-secondary line-through'>
+                    {entry.name}
+                  </span>
+                  <span className='ml-auto rounded-md border border-border bg-background-secondary px-2 py-0.5 font-code text-[11px] text-foreground-secondary'>
+                    defined on {entry.level}
+                  </span>
+                </summary>
+                <pre className='overflow-x-auto px-4 py-3.5 font-code text-[12.5px] leading-relaxed text-foreground-secondary'>
+                  {entry.code}
+                </pre>
+              </details>
             ))}
           </div>
         </TabsContent>

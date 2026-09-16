@@ -1,10 +1,12 @@
-import { getConfigInterceptors } from './getConfigInterceptors';
+import { getInterceptorPhase, getSerializedInterceptors } from './interceptor';
 
 export const getComponentInterceptors = (component: MockServerComponent) => {
-  const configs = component.configs.map(getConfigInterceptors);
+  const phases = getSerializedInterceptors(component.interceptors).map((interceptor) =>
+    getInterceptorPhase(interceptor.$interceptor)
+  );
 
   return {
-    request: Boolean(component.interceptors?.request) || configs.some((config) => config.request),
-    response: Boolean(component.interceptors?.response) || configs.some((config) => config.response)
+    request: phases.includes('request'),
+    response: phases.includes('response')
   };
 };

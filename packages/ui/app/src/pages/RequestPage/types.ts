@@ -1,14 +1,7 @@
 export interface RouteEntry {
   data?: unknown;
   entities?: Record<string, unknown>;
-  interceptors?: { request?: unknown; response?: unknown };
   settings?: { delay?: number; status?: number };
-}
-
-export interface InterceptorEntry {
-  code: string;
-  level: string;
-  type: 'request' | 'response';
 }
 
 export interface RouteMatcher {
